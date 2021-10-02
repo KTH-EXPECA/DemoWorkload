@@ -1,0 +1,10 @@
+FROM python:3.9
+ENV DEBIAN_FRONTEND="noninteractive" TZ="Europe/Stockholm"
+
+COPY client /opt/client
+COPY requirements.txt /opt/client/requirements.txt
+
+WORKDIR /opt/client
+RUN pip install -Ur requirements.txt
+
+ENTRYPOINT ["python", "client.py"]

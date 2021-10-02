@@ -1,0 +1,10 @@
+FROM python:3.9
+ENV DEBIAN_FRONTEND="noninteractive" TZ="Europe/Stockholm"
+
+COPY server /opt/server
+COPY requirements.txt /opt/server/requirements.txt
+
+WORKDIR /opt/server
+RUN pip install -Ur requirements.txt
+
+ENTRYPOINT ["python", "server.py"]
