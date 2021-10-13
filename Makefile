@@ -1,5 +1,5 @@
-client_img := 'expeca/echowkld:client'
-server_img := 'expeca/echowkld:server'
+client_img := 'expeca/primeworkload:client'
+server_img := 'expeca/primeworkload:server'
 client_dockerfile := 'Dockerfile.client'
 server_dockerfile := 'Dockerfile.server'
 
