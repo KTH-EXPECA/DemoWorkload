@@ -1,3 +1,4 @@
+import os
 import time
 
 import msgpack
@@ -67,8 +68,8 @@ class ErastosthenesFactory(Factory):
 
 
 if __name__ == '__main__':
-    # TODO: determine what to parameterize
-    endpoint = TCP4ServerEndpoint(reactor, 5000)
+    port = int(os.environ.get('PORT', 5000))
+    endpoint = TCP4ServerEndpoint(reactor, port)
     d = endpoint.listen(ErastosthenesFactory())
-    d.addCallback(lambda e: logger.info('Started server at 0.0.0.0:5000.'))
+    d.addCallback(lambda e: logger.info(f'Started server at 0.0.0.0:{port}.'))
     reactor.run()

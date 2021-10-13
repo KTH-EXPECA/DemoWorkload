@@ -8,10 +8,12 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 from msgpack import Unpacker
+from twisted.application.internet import ClientService
 from twisted.internet import reactor
-from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
+from twisted.internet.endpoints import clientFromString
+from twisted.internet.interfaces import IAddress
 from twisted.internet.posixbase import PosixReactorBase
-from twisted.internet.protocol import Protocol, connectionDone
+from twisted.internet.protocol import Factory, Protocol, connectionDone
 from twisted.python import failure
 
 reactor: PosixReactorBase = reactor
@@ -71,12 +73,15 @@ class ErastosthenesClient(Protocol):
 
 
 if __name__ == '__main__':
-    server_addr = os.environ.get('SERVER_ADDR', '0.0.0.0')
+    server_addr = os.environ.get('SERVER_ADDR', 'localhost')
     server_port = int(os.environ.get('SERVER_PORT', 5000))
 
-    endpoint = TCP4ClientEndpoint(reactor, server_addr, server_port)
+    endpoint = clientFromString(reactor, f'tcp:{server_addr}:{server_port}')
 
-    d = connectProtocol(endpoint, ErastosthenesClient(server_addr,
-                                                      server_port,
-                                                      target_n=int(1e6)))
+    class _Fact(Factory):
+        def buildProtocol(self, addr: IAddress) -> ErastosthenesClient:
+            return ErastosthenesClient(server_addr, server_port,
+                                       target_n=int(1e6))
+    service = ClientService(endpoint, _Fact())
+    service.startService()
     reactor.run()
