@@ -13,7 +13,7 @@ containers : _logout
 _buildx_support :
 	docker run --privileged --rm tonistiigi/binfmt --install arm64,riscv64,arm ,
 
-_login :
+_login : _buildx_support
 	docker login -u ${docker_user} -p ${docker_pass}
 
 _logout : _build_and_push_client _build_and_push_server
