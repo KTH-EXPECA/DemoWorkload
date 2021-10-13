@@ -24,7 +24,7 @@ class ErastosthenesClient(Protocol):
 
     def __init__(self, server_addr: str, server_port: int, target_n: int):
         super(ErastosthenesClient, self).__init__()
-        logger.info(f'Starting client for server {server_addr}:{server_port}, '
+        logger.info(f'Client connected to {server_addr}:{server_port}, '
                     f'target N = {target_n}.')
         self._saddr = server_addr
         self._sport = server_port
@@ -76,12 +76,17 @@ if __name__ == '__main__':
     server_addr = os.environ.get('SERVER_ADDR', 'localhost')
     server_port = int(os.environ.get('SERVER_PORT', 5000))
 
+    logger.info(f'Initializing client for {server_addr}:{server_port}.')
+
     endpoint = clientFromString(reactor, f'tcp:{server_addr}:{server_port}')
+
 
     class _Fact(Factory):
         def buildProtocol(self, addr: IAddress) -> ErastosthenesClient:
             return ErastosthenesClient(server_addr, server_port,
                                        target_n=int(1e6))
+
+
     service = ClientService(endpoint, _Fact())
     service.startService()
     reactor.run()
