@@ -6,9 +6,12 @@ server_dockerfile := 'Dockerfile.server'
 docker_user := 'expeca'
 docker_pass := 'ExPECAEdgeComputing@KTH'
 
-.PHONY : containers _build_and_push_client _build_and_push_server _login _logout
+.PHONY : containers _build_and_push_client _build_and_push_server _login _logout _buildx_support
 
 containers : _logout
+
+_buildx_support :
+	docker run --privileged --rm tonistiigi/binfmt --install arm64,riscv64,arm ,
 
 _login :
 	docker login -u ${docker_user} -p ${docker_pass}
@@ -17,9 +20,9 @@ _logout : _build_and_push_client _build_and_push_server
 	docker logout
 
 _build_and_push_client : _login
-	docker build -t ${client_img} -f ${client_dockerfile} .
-	docker push ${client_img}
+	docker buildx build --platform linux/amd64,linux/arm64 -t ${client_img} -f ${client_dockerfile} . --push
+	# docker push ${client_img}
 
 _build_and_push_server : _login
-	docker build -t ${server_img} -f ${server_dockerfile} .
-	docker push ${server_img}
+	docker buildx build --platform linux/amd64,linux/arm64 -t ${server_img} -f ${server_dockerfile} . --push
+	# docker push ${server_img}
